@@ -11,6 +11,10 @@ StreamCatcher.prototype.read = function(key, readStream){
 
     this._cache.del(key);
 
+    if(!this._reading[key]){
+        this._reading[key] = 0;
+    }
+
     this._reading[key]++;
 
     var data = '';
@@ -38,14 +42,20 @@ StreamCatcher.prototype.write = function(key, writeStream, needsStream){
 
     if(data != null){
         writeStream.write(data);
+        writeStream.end();
         return;
     }
-    
+
     if(!this._reading[key]){
-        needsStream && needsStream(key);
+        if(needsStream){
+            needsStream(key);
+        }
     }
 
-    this._pendingWriteStreams[key] || (this._pendingWriteStreams[key] = []);
+    if(this._pendingWriteStreams[key]){
+        this._pendingWriteStreams[key] = [];
+    }
+
     this._pendingWriteStreams[key].push(writeStream);
 };
 
