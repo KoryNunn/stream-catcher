@@ -70,5 +70,14 @@ StreamCatcher.prototype.write = function(key, writeStream, needsStream){
 
     this._pendingWriteStreams[key].push(writeStream);
 };
+StreamCatcher.prototype.has = function(key){
+    return this._cache.has(key) || !!this._reading[key];
+};
+StreamCatcher.prototype.del = function(key){
+    return this._cache.del(key);
+};
+StreamCatcher.prototype.reset = function(key){
+    return this._cache.reset(key);
+};
 
 module.exports = StreamCatcher;
