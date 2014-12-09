@@ -52,7 +52,7 @@ StreamCatcher.prototype.write = function(key, writeStream, needsStream){
         }
     }
 
-    if(this._pendingWriteStreams[key]){
+    if(!this._pendingWriteStreams[key]){
         this._pendingWriteStreams[key] = [];
     }
 
