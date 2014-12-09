@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "a streaming wrapper around lru-cache",
   "main": "index.js",
+  "keywords":["stream", "cache", "lru"],
   "directories": {
     "test": "./test"
   },
