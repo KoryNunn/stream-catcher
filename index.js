@@ -17,15 +17,27 @@ StreamCatcher.prototype.read = function(key, readStream){
 
     this._reading[key]++;
 
-    var data = '';
+    var objectMode = readStream.objectMode,
+        data = objectMode ? [] :'';
 
     var cacheThrough = through(function(chunk){
-        data += chunk;
+        if(objectMode){
+            data.push(chunk);
+        }else{
+            data += chunk;
+        }
         var pendingWriteStreams = catcher._pendingWriteStreams[key];
 
         while(pendingWriteStreams && pendingWriteStreams.length){
             var writeStream = pendingWriteStreams.pop();
-            writeStream.write(data);
+            if(objectMode){
+                data.forEach(function(chunk){
+                    writeStream.write(chunk);
+                });
+            }else{
+                writeStream.write(data);
+            }
+
             readStream.pipe(writeStream);
         }
     }, function(){
