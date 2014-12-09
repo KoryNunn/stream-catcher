@@ -74,7 +74,7 @@ test('stream to target', function(t){
 });
 
 test('totes', function(t){
-    var hits = 100;
+    var hits = 5;
     t.plan(hits);
 
     var catcher = new StreamCatcher({
