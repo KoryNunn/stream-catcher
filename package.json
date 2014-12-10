@@ -25,11 +25,11 @@
   },
   "homepage": "https://github.com/KoryNunn/stream-catcher",
   "dependencies": {
+    "concat-stream": "^1.4.7",
     "lru-cache": "^2.5.0",
     "through": "^2.3.6"
   },
   "devDependencies": {
-    "concat-stream": "^1.4.7",
     "readable-stream": "^1.0.33",
     "tape": "^3.0.3"
   }
