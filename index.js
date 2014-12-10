@@ -1,5 +1,6 @@
 var cache = require('lru-cache'),
-    through = require('through');
+    through = require('through'),
+    concat = require('concat-stream');
 
 function StreamCatcher(options){
     this._pendingWriteStreams = {};
@@ -7,7 +8,13 @@ function StreamCatcher(options){
     this._cache = cache(options);
 }
 StreamCatcher.prototype.read = function(key, readStream){
-    var catcher = this;
+    var catcher = this,
+        concatStream = concat(function(data){
+            catcher._reading[key]--;
+            if(catcher._reading[key] === 0){
+                catcher._cache.set(key, data);
+            }
+        });
 
     this._cache.del(key);
 
@@ -17,33 +24,22 @@ StreamCatcher.prototype.read = function(key, readStream){
 
     this._reading[key]++;
 
-    var objectMode = readStream.objectMode,
-        data = objectMode ? [] :'';
+    readStream.pipe(concatStream);
 
-    var cacheThrough = through(function(chunk){
-        if(objectMode){
-            data.push(chunk);
-        }else{
-            data += chunk;
-        }
+    var cacheThrough = through(function(){
         var pendingWriteStreams = catcher._pendingWriteStreams[key];
 
         while(pendingWriteStreams && pendingWriteStreams.length){
             var writeStream = pendingWriteStreams.pop();
-            if(objectMode){
-                data.forEach(function(chunk){
+            if(readStream.objectMode){
+                concatStream.getBody().forEach(function(chunk){
                     writeStream.write(chunk);
                 });
             }else{
-                writeStream.write(data);
+                writeStream.write(concatStream.getBody());
             }
 
             readStream.pipe(writeStream);
-        }
-    }, function(){
-        catcher._reading[key]--;
-        if(catcher._reading[key] === 0){
-            catcher._cache.set(key, data);
         }
     });
 
