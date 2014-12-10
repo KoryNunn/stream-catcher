@@ -1,6 +1,6 @@
 {
   "name": "stream-catcher",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "a streaming wrapper around lru-cache",
   "main": "index.js",
   "keywords": [
