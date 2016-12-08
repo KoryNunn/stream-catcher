@@ -49,6 +49,9 @@ StreamCatcher.prototype.write = function(key, writeStream, needsStream){
     var data = this._cache.get(key);
 
     if(data != null){
+        if(Array.isArray(data)){
+            data = '';
+        }
         writeStream.write(data);
         writeStream.end();
         return;
